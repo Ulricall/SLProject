@@ -6,6 +6,7 @@ import numpy as np
 from utils.LogisticRegression import LinearLogisticRegression, RegularLogisticRegression
 from utils.RDA import RegularizedDiscriminantAnalysis
 from utils.DeepLearn import DeepLearningModel
+from utils.SVM import MultiClassSVM
 
 def SVD(x, d):
     svd = TruncatedSVD(n_components=d)
@@ -35,6 +36,7 @@ if __name__ == '__main__':
         raw_test_data = pickle.load(f).toarray()
     train_data = SVD(raw_train_data, d=733)
     test_data = SVD(raw_test_data, d=733)
+    print(train_data.shape)
     # train_data = svd_dimension_reduction(raw_train_data, 0.5)
 
     accuracies = []
@@ -51,21 +53,22 @@ if __name__ == '__main__':
         y_test = y_folds[i]
         
         # model = RegularLogisticRegression(reg_lambda=0)
-        model = RegularizedDiscriminantAnalysis()
+        # model = RegularizedDiscriminantAnalysis(alpha=0.995, gamma=0.995)
         # model = DeepLearningModel(hidden=[256, 256], lr=0.001)
+        model = MultiClassSVM()
         model.fit(X_train, y_train)
         pred = model.predict(X_test)
 
-        aic = model.compute_aic(X_test, y_test)
-        bic = model.compute_bic(X_test, y_test)
+        # aic = model.compute_aic(X_test, y_test)
+        # bic = model.compute_bic(X_test, y_test)
 
         accuracy = np.sum([pred == y_test]) / np.shape(X_test)[0]
         accuracies.append(accuracy)
-        AICs.append(aic)
-        BICs.append(bic)
+        # AICs.append(aic)
+        # BICs.append(bic)
         print(f"Fold {i+1}, Accuracy: {accuracy:.3f}")
     print(f"Average Cross-Validation Accuracy: {np.mean(accuracies):.3f}")
-    print(f"Cross-Validation: AIC={np.mean(AICs)}, BIC={np.mean(BICs)}")
+    # print(f"Cross-Validation: AIC={np.mean(AICs)}, BIC={np.mean(BICs)}")
 
     """ Bootstrap """
     # for i in range(10):
@@ -75,7 +78,8 @@ if __name__ == '__main__':
     #     X_train, y_train = train_data[train_idx], train_label[train_idx]
     #     X_test, y_test = train_data[test_idx], train_label[test_idx]
 
-    #     model = RegularLogisticRegression(reg_lambda=0)
+    #     # model = RegularLogisticRegression(reg_lambda=0)
+    #     model = RegularizedDiscriminantAnalysis(alpha=0.97, gamma=0.97)
     #     model.fit(X_train, y_train)
     #     pred = model.predict(X_test)
     #     aic = model.compute_aic(X_test, y_test)
