@@ -22,21 +22,21 @@ class BinarySVM:
         b = matrix(np.zeros(1))
         solvers.options['show_progress'] = False
         solution = solvers.qp(P, q, G, h, A, b)
-        alphas = np.array(solution['x'])
+        alphas = np.array(solution['x']).squeeze(1)
+        # print(alphas)
 
         sv = alphas > 1e-4
         self.alpha = alphas[sv]
         self.sv = X[sv]
-        self.sv_y = y[sv]
+        self.sv_y = y[sv].squeeze(1)
         
-        self.w = np.sum(self.alpha * self.sv_y * self.sv, axis=0).reshape(-1, 1)
+        self.w = np.zeros(X.shape[1])
+        for i in range(self.alpha.shape[0]):
+            self.w += self.alpha[i] * self.sv_y[i] * self.sv[i,:]
         self.b = np.mean(self.sv_y - np.dot(self.sv, self.w))
 
     def decision_function(self, X):
         return np.dot(X, self.w) + self.b
-
-    def predict(self, X):
-        return np.sign(self.decision_function(X))
 
 class MultiClassSVM:
     def __init__(self, C=1.0):

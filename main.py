@@ -43,7 +43,7 @@ if __name__ == '__main__':
     AICs = []
     BICs = []
     """ K-fold cross-validation """
-    k = 10
+    k = 3
     X_folds = np.array_split(train_data, k)
     y_folds = np.array_split(train_label, k)
     for i in range(k):
@@ -55,8 +55,8 @@ if __name__ == '__main__':
         # model = RegularLogisticRegression(reg_lambda=0)
         # model = RegularizedDiscriminantAnalysis(alpha=0.995, gamma=0.995)
         # model = DeepLearningModel(hidden=[256, 256], lr=0.001)
-        model = MultiClassSVM()
-        model.fit(X_train, y_train)
+        model = MultiClassSVM(C=0.2)
+        model.fit(X_train[:2500,:], y_train[:2500])
         pred = model.predict(X_test)
 
         # aic = model.compute_aic(X_test, y_test)
